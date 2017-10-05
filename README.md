@@ -43,7 +43,7 @@ You'll need Python 3 and Jupyter Notebooks installed to do this project.  The be
 
 If for some reason you choose not to use Anaconda, you must install the following frameworks and packages on your system:
 * Python 3.x
-* Tensorflow 1.2.1
+* Tensorflow 1.2.1 to 1.3
 * NumPy 1.11
 * SciPy 0.17.0
 * eventlet 
