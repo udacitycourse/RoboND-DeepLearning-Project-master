@@ -104,9 +104,9 @@ def combine_masks(processed_folder):
 
         base_name = os.path.basename(i)
         ind = base_name.find('cam')
-        new_fname = base_name[:ind] + '_mask'+ base_name[ind+4:]
+        new_fname = base_name[:ind] + 'mask'+ base_name[ind+4:]
 
-        dir_base = str(os.sep).join(i.split('/')[:-1])
+        dir_base = str(os.sep).join(i.split(str(os.sep))[:-1])
         misc.imsave(os.path.join(dir_base, new_fname), im)
         os.remove(i)
         os.remove(cam3[e])
@@ -154,3 +154,41 @@ if __name__ == '__main__':
 
     combine_masks(out_val_dir)
     combine_masks(out_train_dir)
+    
+    
+    
+    
+    
+    from PIL import Image
+    
+    # Fix names
+    
+    arr=[]
+    for filename in glob.glob('../data/processed_sim_data/train/images/*.jpeg'): 
+        s = filename.split("\\")
+        arr.append(s[-1])
+    
+    i=0
+    arr_new=[]
+    for filename in glob.glob('../data/processed_sim_data/train/masks/*.png'): 
+        s = filename.split("\\")
+        s2 = arr[i].split(".")
+        s3 = s2[-2].split("_")
+        os.rename('../data/processed_sim_data/train/masks/' + s[-1],'../data/processed_sim_data/train/masks/' + s3[0] + '_' + s3[1] + '_mask_' + s3[2] + '.png')
+        i+=1
+
+    # Flip pics
+    
+    for filename in glob.glob('../data/processed_sim_data/train/images/*.jpeg'):
+        im = Image.open(filename).transpose(Image.FLIP_LEFT_RIGHT)
+        s = filename.split("\\")
+        if not 'flipped_' in s[-1]:
+            im.save('../data/processed_sim_data/train/images/flipped_' + s[-1])
+    
+    for filename in glob.glob('../data/processed_sim_data/train/masks/*.png'):
+        im = Image.open(filename).transpose(Image.FLIP_LEFT_RIGHT)
+        s = filename.split("\\")
+        if not 'flipped_' in s[-1]:
+            im.save('../data/processed_sim_data/train/masks/flipped_' + s[-1])
+    
+    

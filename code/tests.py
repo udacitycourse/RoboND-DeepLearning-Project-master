@@ -1,57 +1,28 @@
 import os
 import glob
 
-from tensorflow.contrib.keras.python import keras
-from tensorflow.contrib.keras.python.keras import layers, models
-
 from utils import scoring_utils
 from utils import plotting_tools 
 from utils import model_tools
 
-
-from model_training import fcn_model
-
-
-#### Build model ####
-
-# Input size
-image_hw = 160
-image_shape = (image_hw, image_hw, 3)
-inputs = layers.Input(image_shape)
-
-# Classes
-num_classes = 3
-
-# Starting depth of encode/decode
-depth_ = 32
-# Dropout rate
-keepProb = 0.6
-
-# Standard model parameters
-learning_rate = 0.001
-batch_size = 8
-num_epochs = 200
-steps_per_epoch = len([n for n in os.listdir("../data/train/images")]) // batch_size
-validation_steps = len([n for n in os.listdir("../data/train/images")]) // batch_size
-workers = 1
-
-
-# Call fcn_model()
-output_layer = fcn_model(inputs, num_classes, depth_, keepProb)
-
-# Define the Keras model and compile it for training
-model = models.Model(inputs=inputs, outputs=output_layer)
-
-model.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='categorical_crossentropy')
-
-
-#### Test on Pics ####
+### Test on Pics ####
 list_of_files = glob.glob('../data/weights/*') # * means all if need specific format then *.csv
 # Last created file
-weight_file_name = max(list_of_files, key=os.path.getctime)
+weight_file_name =  max(list_of_files, key=os.path.getctime)
+weight_file_name = weight_file_name.split("\\")
 
-model_tools.load_network(weight_file_name)
+if 'config_' in weight_file_name[-1]:
+    model = model_tools.load_network(weight_file_name[-2])
+else:
+    model = model_tools.load_network(weight_file_name[-1])
 
+
+#for iii in range(len(weight_file_name)):
+#    if not 'config_' in weight_file_name[iii]:
+#        weight_file_nam = weight_file_name[iii].split("\\")
+#        model_tools.load_network(weight_file_nam[-1])
+        
+        
 run_num = 'run_1'
 
 
@@ -115,3 +86,11 @@ print("IoU no hero - ", final_IoU)
 # And the final grade score is 
 final_score = final_IoU * weight
 print("Final Grade - ", final_score)
+        
+        #if fs < final_score:
+        #    fs=final_score
+        #    nam = weight_file_name[iii]
+        
+            
+#print('score',fs)
+#print('nam',nam)
