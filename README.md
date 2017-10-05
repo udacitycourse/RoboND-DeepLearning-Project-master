@@ -7,6 +7,14 @@ In this project, you will train a deep neural network to identify and track a ta
 [image_0]: ./docs/misc/sim_screenshot.png
 ![alt text][image_0] 
 
+
+## Files in the project
+
+1) code/model_training.py - pipeline to train the model
+2) code/preprocess_ims.py - preprocess images from Udacity's simulator (changed to flip pictures and use correct naming for masks)
+3) tests.py - file to run tests and see final score for the last model
+4) untitled1.py - garbage file with temporary functions and experiments
+
 ## Setup Instructions
 **Clone the repository**
 ```
