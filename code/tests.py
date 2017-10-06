@@ -5,17 +5,37 @@ from utils import scoring_utils
 from utils import plotting_tools 
 from utils import model_tools
 
+from tensorflow.contrib.keras.python import keras
+from tensorflow.contrib.keras.python.keras import layers, models
+
+from utils.separable_conv2d import SeparableConv2DKeras, BilinearUpSampling2D
+from utils import data_iterator
+from utils import plotting_tools 
+from utils import model_tools
+
+from datetime import datetime
+from utils import scoring_utils
+
 ### Test on Pics ####
+
+model = model_tools.load_network('0.49256118836_model_23_25_04_10_2017.h5')
+
+'''
+# This part did not work for reviewer, windows only
+# config is uploaded instead of the model
+# works for me though
+
 list_of_files = glob.glob('../data/weights/*') # * means all if need specific format then *.csv
 # Last created file
 weight_file_name =  max(list_of_files, key=os.path.getctime)
 weight_file_name = weight_file_name.split("\\")
 
-if 'config_' in weight_file_name[-1]:
+
+if 'config' in weight_file_name[-1]:
     model = model_tools.load_network(weight_file_name[-2])
 else:
     model = model_tools.load_network(weight_file_name[-1])
-
+'''
 
 #for iii in range(len(weight_file_name)):
 #    if not 'config_' in weight_file_name[iii]:

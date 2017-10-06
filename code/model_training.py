@@ -168,7 +168,7 @@ def fcn_model(inputs, num_classes, depth_=32, keepProb=0.6):
     # Encode 3
     x2 = encoder_block(x1_2, depth_*4, 2)
     
-    
+    # Encode 4
     x3 = encoder_block(x2, depth_*8, 2)
     
     # Fully connected
@@ -255,10 +255,17 @@ if __name__ == "__main__":
     
     
     # Load latest model for retraining
+    # that will not work only in windows
+    
     list_of_files = glob.glob('../data/weights/*') # * means all if need specific format then *.csv
     weight_file_name =  max(list_of_files, key=os.path.getctime)
     weight_file_name = weight_file_name.split("\\")
     model = model_tools.load_network(weight_file_name[-1])
+    
+    # if you are not on windows, copy name of the model
+    # from 'weights' folder and uncomment
+    
+    #model = model_tools.load_network('your_model_name')
     
     # Compile
     model.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='categorical_crossentropy')
@@ -290,9 +297,9 @@ if __name__ == "__main__":
         model.fit_generator(train_iter,
                             steps_per_epoch = steps_per_epoch, # the number of batches per epoch,
                             epochs = 1, # the number of epochs to train for,
-                            validation_data = val_iter, # validation iterator
-                            validation_steps = validation_steps, # the number of batches to validate on
-                            callbacks=callbacks,
+                            #validation_data = val_iter, # validation iterator
+                            #validation_steps = validation_steps, # the number of batches to validate on
+                            #callbacks=callbacks,
                             workers = workers)
     
         #### Evaluate ####
