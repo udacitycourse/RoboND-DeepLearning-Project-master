@@ -156,7 +156,7 @@ def fcn_model(inputs, num_classes, depth_=32, keepProb=0.6):
     #x=layers.Dropout(keepProb)(x)
     inputs=x
     '''
-    
+    '''
     # Encode 1
     x0 = encoder_block(inputs, depth_, 2)
     # Encode 2
@@ -204,6 +204,76 @@ def fcn_model(inputs, num_classes, depth_=32, keepProb=0.6):
     x1 = decoder_block(x2, x0, depth_*2)
     # Decode 3
     x = decoder_block(x1, inputs, depth_)
+    '''
+    
+    # Architecture bellow
+    # https://arxiv.org/abs/1708.01692
+    
+    # Encode 1
+    x0 = encoder_block(inputs, depth_, 2)
+    # Full conn - 1.1
+    x0_2 = conv2d_batchnorm(x0, depth_*2, kernel_size=1, strides=1)
+    x0_3 = conv2d_batchnorm(x0_2, depth_*2, kernel_size=1, strides=1)
+    
+    # Encode 2
+    x1 = encoder_block(x0_3, depth_*2, 2)
+    # Full conn - 2.1
+    x1_2 = conv2d_batchnorm(x1, depth_*2, kernel_size=1, strides=1)
+    x1_3 = conv2d_batchnorm(x1_2, depth_*2, kernel_size=1, strides=1)
+    
+    # Encode 3
+    x2 = encoder_block(x1_3, depth_*4, 2)
+    # Full conn - 3.1
+    x2_2 = conv2d_batchnorm(x2, depth_*4, kernel_size=1, strides=1)
+    x2_3 = conv2d_batchnorm(x2_2, depth_*4, kernel_size=1, strides=1)
+    
+    # Encode 4
+    x3 = encoder_block(x2_3, depth_*8, 2)
+    # Full conn - 3.1
+    x3_2 = conv2d_batchnorm(x3, depth_*8, kernel_size=1, strides=1)
+    x3_3 = conv2d_batchnorm(x3_2, depth_*8, kernel_size=1, strides=1)
+    
+    # Encode 5
+    x4 = encoder_block(x3_3, depth_*16, 2)
+    # Full conn - 3.1
+    x4_2 = conv2d_batchnorm(x4, depth_*16, kernel_size=1, strides=1)
+    x4_3 = conv2d_batchnorm(x4_2, depth_*16, kernel_size=1, strides=1)
+    x4_4 = conv2d_batchnorm(x4_3, depth_*16, kernel_size=1, strides=1)
+    
+    # Fully connected
+    x5 = conv2d_batchnorm(x4_4, depth_*16, kernel_size=1, strides=1)
+    # Full conn - 4.1
+    x5_2 = conv2d_batchnorm(x5, depth_*16, kernel_size=1, strides=1)
+    x5_3 = conv2d_batchnorm(x5_2, depth_*16, kernel_size=1, strides=1)
+    x5_4 = conv2d_batchnorm(x5_3, depth_*16, kernel_size=1, strides=1)
+    
+    # Decode 1
+    x4 = decoder_block(x5_4, x3_3, depth_*8)
+    # Full conn - 1.1
+    x4_2 = conv2d_batchnorm(x4, depth_*8, kernel_size=1, strides=1)
+    x4_3 = conv2d_batchnorm(x4_2, depth_*8, kernel_size=1, strides=1)
+    x4_4 = conv2d_batchnorm(x4_3, depth_*8, kernel_size=1, strides=1)
+    
+    # Decode 2
+    x3 = decoder_block(x4_4, x2_3, depth_*4)
+    # Full conn - 2.1
+    x3_2 = conv2d_batchnorm(x3, depth_*4, kernel_size=1, strides=1)
+    x3_3 = conv2d_batchnorm(x3_2, depth_*4, kernel_size=1, strides=1)
+    x3_4 = conv2d_batchnorm(x3_3, depth_*4, kernel_size=1, strides=1)
+    
+    # Decode 3
+    x2 = decoder_block(x3_4, x1_3, depth_*4)
+    # Full conn - 3.1
+    x2_2 = conv2d_batchnorm(x2, depth_*2, kernel_size=1, strides=1)
+    x2_3 = conv2d_batchnorm(x2_2, depth_*2, kernel_size=1, strides=1)
+    x2_4 = conv2d_batchnorm(x2_3, depth_*2, kernel_size=1, strides=1)
+    
+    # Decode 4
+    x2 = decoder_block(x2_4, x0_3, depth_*2)
+    
+    # Decode 5
+    x = decoder_block(x2, inputs, depth_)
+        
     
     
     
@@ -224,7 +294,7 @@ if __name__ == "__main__":
     ### Hyperparameters ###
     
     # Input size
-    image_hw = 160
+    image_hw = 256
     image_shape = (image_hw, image_hw, 3)
     inputs = layers.Input(image_shape)
     
@@ -232,7 +302,7 @@ if __name__ == "__main__":
     num_classes = 3
     
     # Starting depth of encode/decode
-    depth_ = 64
+    depth_ = 32
     # Dropout rate
     keepProb = 0.6
     
@@ -256,7 +326,7 @@ if __name__ == "__main__":
     
     # Load latest model for retraining
     # that will not work only in windows
-    
+    '''
     list_of_files = glob.glob('../data/weights/*') # * means all if need specific format then *.csv
     weight_file_name =  max(list_of_files, key=os.path.getctime)
     weight_file_name = weight_file_name.split("\\")
@@ -266,15 +336,16 @@ if __name__ == "__main__":
     # from 'weights' folder and uncomment
     
     #model = model_tools.load_network('your_model_name')
-    
+    '''
     # Compile
     model.compile(optimizer=keras.optimizers.Adam(learning_rate), loss='categorical_crossentropy')
     
     # Current best score
-    s = weight_file_name[-1].split('_')
-    fg = float(s[0]) 
+    #s = weight_file_name[-1].split('_')
+    #fg = float(s[0]) 
     arr=[]
     
+    fg = 0.4
     # To change evaluation pipeline
     # that way we test after each epoch and save the best
     for i in range(num_epochs):
@@ -318,7 +389,26 @@ if __name__ == "__main__":
         val_following, pred_following = model_tools.write_predictions_grade_set(model,
                                                 run_num,'following_images', 'sample_evaluation_data')
     
-        
+        print("Images while following the target")
+        im_files = plotting_tools.get_im_file_sample('sample_evaluation_data','following_images', run_num) 
+        for i in range(3):
+            im_tuple = plotting_tools.load_images(im_files[i])
+            plotting_tools.show_images(im_tuple)
+            
+            
+        print("Images while at patrol without target")
+        im_files = plotting_tools.get_im_file_sample('sample_evaluation_data','patrol_non_targ', run_num) 
+        for i in range(3):
+            im_tuple = plotting_tools.load_images(im_files[i])
+            plotting_tools.show_images(im_tuple)
+         
+            
+        print("Images while at patrol with target")
+        im_files = plotting_tools.get_im_file_sample('sample_evaluation_data','patrol_with_targ', run_num) 
+        for i in range(3):
+            im_tuple = plotting_tools.load_images(im_files[i])
+            plotting_tools.show_images(im_tuple)
+
         print("Quad behind the target")
         true_pos1, false_pos1, false_neg1, iou1 = scoring_utils.score_run_iou(val_following, pred_following)
         
